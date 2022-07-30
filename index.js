@@ -14,7 +14,7 @@ const httpServer = HTTP.createServer(function (req, res) {
 
 // Start the http server
 httpServer.listen(config.httpPort, () => {
-  console.log(`    Server is listening on port ${config.httpPort}. \n    Press CTRL + C to stop the server. \n    Check connection at: http://localhost:${config.httpPort}/ping`);
+  console.log(`    Server is listening on port ${config.httpPort}. \n    Press CTRL + C to stop the server. \n    Check connection at: http://localhost:${config.httpPort}/ping \n\n`);
 });
 
 const unifiedServer = (req, res) => {
@@ -94,4 +94,5 @@ const unifiedServer = (req, res) => {
 const router = {
   ping: handlers.ping,
   crud: handlers.crud,
+  userCrud: handlers.userCrud,
 };
