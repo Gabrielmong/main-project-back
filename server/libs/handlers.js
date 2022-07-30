@@ -282,7 +282,6 @@ handlers._userCrud.put = async function (data, callback) {
       ? data.payload.telefono.trim()
       : false;
 
-
   if (indNombre && indApellido && nombre && apellido && correo && telefono) {
     var connection;
     try {
@@ -294,7 +293,8 @@ handlers._userCrud.put = async function (data, callback) {
       await connection.execute(
         `BEGIN
           ${statement};
-        END;`);
+        END;`
+      );
       callback(200, { error: "User updated in the DB" });
     } catch (err) {
       console.error(err);
@@ -343,6 +343,125 @@ handlers._userCrud.delete = async function (data, callback) {
     }
   } else {
     callback(400, { error: "Missing required fields" });
+  }
+};
+
+handlers.crudReviews = function (data, callback) {
+  var acceptableMethods = ["post", "get", "put", "delete"];
+  if (acceptableMethods.indexOf(data.method) > -1) {
+    handlers._crudReviews[data.method](data, callback);
+  } else {
+    callback(405);
+  }
+};
+
+handlers._crudReviews = {};
+
+handlers._crudReviews.post = async function (data, callback) {
+  var restaurante =
+    typeof data.payload.restaurante == "string" &&
+    data.payload.restaurante.trim().length > 0
+      ? data.payload.restaurante.trim()
+      : false;
+  var usuario =
+    typeof data.payload.usuario == "string" &&
+    data.payload.usuario.trim().length > 0
+      ? data.payload.usuario.trim()
+      : false;
+  var rating =
+    typeof data.payload.rating == "number" &&
+    data.payload.rating % 1 === 0 &&
+    data.payload.rating >= 0
+      ? data.payload.rating
+      : false;
+  var review =
+    typeof data.payload.review == "string" &&
+    data.payload.review.trim().length > 0
+      ? data.payload.review.trim()
+      : false;
+  var ubicacion =
+    typeof data.payload.ubicacion == "string" &&
+    data.payload.ubicacion.trim().length > 0
+      ? data.payload.ubicacion.trim()
+      : false;
+  var created =
+    typeof data.payload.created == "string" &&
+    data.payload.created.trim().length > 0
+      ? data.payload.created.trim()
+      : false;
+
+  if (restaurante && usuario && rating && review && ubicacion && created) {
+    var connection;
+    try {
+      connection = await oracledb.getConnection(dbconfig);
+      var statement = `insertReview('${restaurante}', '${usuario}', ${rating}, '${review}', TO_DATE('${created}','YYYY-MM-DD'), '${ubicacion}')`;
+      console.log(statement);
+      await connection.execute(
+        `BEGIN
+          ${statement};
+        END;`
+      );
+      await connection.commit();
+
+      callback(200, { error: "Review created!" });
+    } catch (err) {
+      console.error(err);
+      callback(500, { error: "Could not insert in the DB" });
+    } finally {
+      if (connection) {
+        await connection.close();
+      }
+    }
+  } else {
+    callback(400, { error: "Missing required fields" });
+  }
+};
+
+handlers._crudReviews.get = async function (data, callback) {
+  var connection;
+  try {
+    connection = await oracledb.getConnection(dbconfig);
+    var statement = `SELECT * FROM REVIEW`;
+    var result = await connection.execute(statement);
+    callback(200, result.rows);
+  } catch (err) {
+    console.error(err);
+    callback(500, { error: "Could not get from the DB" });
+  } finally {
+    if (connection) {
+      await connection.close();
+    }
+  }
+};
+
+handlers.loneReview = function (data, callback) {
+  var acceptableMethods = ["get", "put", "delete"];
+  if (acceptableMethods.indexOf(data.method) > -1) {
+    handlers._loneReview[data.method](data, callback);
+  } else {
+    callback(405);
+  }
+};
+
+handlers._loneReview = {};
+
+handlers._loneReview.get = async function (data, callback) {
+  id = data.queryStringObject.id;
+  if (id) {
+    var connection;
+    try {
+      connection = await oracledb.getConnection(dbconfig);
+      var statement = `SELECT * FROM REVIEW WHERE ID_REVIEW = ${id}`;
+      var result = await connection.execute(statement);
+      callback(200, result.rows);
+    } catch (err) {
+      console.error(err);
+      callback(500, { error: "Could not get from the DB" });
+    } finally {
+      if (connection) {
+        await connection.close();
+      }
+    }
   }
 };
 

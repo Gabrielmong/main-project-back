@@ -95,4 +95,6 @@ const router = {
   ping: handlers.ping,
   crud: handlers.crud,
   userCrud: handlers.userCrud,
+  crudReviews: handlers.crudReviews,
+  loneReview: handlers.loneReview,
 };
