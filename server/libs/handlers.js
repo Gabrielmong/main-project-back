@@ -211,23 +211,24 @@ handlers._userCrud.post = async function (data, callback) {
 };
 
 handlers._userCrud.get = async function (data, callback) {
-  var nombre =
-    typeof data.queryStringObject.nombre == "string" &&
-    data.queryStringObject.nombre.trim().length > 0
-      ? data.queryStringObject.nombre.trim()
+  var userName =
+    typeof data.queryStringObject.userName == "string" &&
+    data.queryStringObject.userName.trim().length > 0
+      ? data.queryStringObject.userName.trim()
       : false;
-  var apellido =
-    typeof data.queryStringObject.apellido == "string" &&
-    data.queryStringObject.apellido.trim().length > 0
-      ? data.queryStringObject.apellido.trim()
+  var password =
+    typeof data.queryStringObject.password == "string" &&
+    data.queryStringObject.password.trim().length > 0
+      ? data.queryStringObject.password.trim()
       : false;
 
-  if (nombre && apellido) {
+      console.log(data.queryStringObject);
+  if (userName && password) {
     var connection;
     try {
       connection = await oracledb.getConnection(dbconfig);
       // Por la forma en que oracle retorna resultados de un stored procedure, no se puede extraer los rows
-      var statement = `select * from USUARIO where nombre = '${nombre}' and apellido = '${apellido}'`;
+      var statement = `select * from USUARIO where userName = '${userName}' and userPassword = '${password}'`;
       console.log(statement);
       var result = await connection.execute(`${statement}`);
       await connection.commit();
@@ -464,6 +465,89 @@ handlers._loneReview.get = async function (data, callback) {
     }
   }
 };
+
+handlers._loneReview.put = async function (data, callback) {
+  id = data.queryStringObject.id;
+  var restaurante =
+    typeof data.payload.restaurante == "string" &&
+    data.payload.restaurante.trim().length > 0
+      ? data.payload.restaurante.trim()
+      : false;
+  var usuario =
+    typeof data.payload.usuario == "string" &&
+    data.payload.usuario.trim().length > 0
+      ? data.payload.usuario.trim()
+      : false;  
+  var rating =
+    typeof data.payload.rating == "number" &&
+    data.payload.rating % 1 === 0 &&
+    data.payload.rating >= 0
+      ? data.payload.rating
+      : false;
+  var review =
+    typeof data.payload.review == "string" &&
+    data.payload.review.trim().length > 0
+      ? data.payload.review.trim()
+      : false;
+  var ubicacion =
+    typeof data.payload.ubicacion == "string" &&
+    data.payload.ubicacion.trim().length > 0
+      ? data.payload.ubicacion.trim()
+      : false;
+  var created =
+    typeof data.payload.created == "string" &&
+    data.payload.created.trim().length > 0
+      ? data.payload.created.trim()
+      : false;
+
+  if (id && restaurante && usuario && rating && review && ubicacion && created) {
+    var connection;
+    try {
+      connection = await oracledb.getConnection(dbconfig);
+      var statement = `UPDATE REVIEW SET RESTAURANTE = '${restaurante}', USUARIO = '${usuario}', RATING = ${rating}, REVIEW = '${review}', UBICACION = '${ubicacion}', CREATED = TO_DATE('${created}','YYYY-MM-DD') WHERE ID_REVIEW = ${id}`;
+
+      await connection.execute(
+        `BEGIN
+          ${statement};
+        END;`
+      );
+      await connection.commit();
+        
+      callback(200, { error: "Review updated!" });
+    } catch (err) {
+      console.error(err);
+      callback(500, { error: "Could not update in the DB" });
+    } finally {
+      if (connection) {
+        await connection.close();
+
+      }
+    }
+  } else {
+    callback(400, { error: "Missing required fields" });
+  }
+}
+
+handlers.uploadImg = function (data, callback) {
+  var acceptableMethods = ["post"];
+  if (acceptableMethods.indexOf(data.method) > -1) {
+    handlers._uploadImg[data.method](data, callback);
+  } else {
+    callback(405);
+  }
+}
+
+
+handlers._uploadImg = {};
+
+
+handlers._uploadImg.post = async function (data, callback) {
+  console.log(data.payload);
+  callback(200, { error: "Algo" });
+}
+
+
+
 
 // Ping handler
 handlers.ping = function (data, callback) {
