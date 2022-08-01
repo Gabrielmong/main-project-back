@@ -32,7 +32,7 @@ CREATE TABLE review (
 ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD';
 
 INSERT INTO review (restaurante, usuario, rating, review, created, ubicacion)
-    VALUES ('McDonalds', 'Gabriel', 5, 'Aquí va muchísimo texto', '2022-07-30', 'San José', 'empanada.png');
+    VALUES ('McDonalds', 'Gabriel', 5, 'Aquí va muchísimo texto', '2022-07-30', 'San José');
 
 
 SELECT * FROM review;
