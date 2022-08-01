@@ -528,27 +528,6 @@ handlers._loneReview.put = async function (data, callback) {
   }
 }
 
-handlers.uploadImg = function (data, callback) {
-  var acceptableMethods = ["post"];
-  if (acceptableMethods.indexOf(data.method) > -1) {
-    handlers._uploadImg[data.method](data, callback);
-  } else {
-    callback(405);
-  }
-}
-
-
-handlers._uploadImg = {};
-
-
-handlers._uploadImg.post = async function (data, callback) {
-  console.log(data.payload);
-  callback(200, { error: "Algo" });
-}
-
-
-
-
 // Ping handler
 handlers.ping = function (data, callback) {
   callback(200, { status: "Success!" });
