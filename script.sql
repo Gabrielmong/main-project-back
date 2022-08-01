@@ -26,13 +26,13 @@ CREATE TABLE review (
     review VARCHAR2(1024),
     created DATE,
     ubicacion VARCHAR2(20),
-    imagen VARCHAR2(500)
+    fileName VARCHAR2(500)
 )
 
 ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD';
 
 INSERT INTO review (restaurante, usuario, rating, review, created, ubicacion)
-    VALUES ('McDonalds', 'Gabriel', 5, 'Aquí va muchísimo texto', '2022-07-30', 'San José');
+    VALUES ('McDonalds', 'Gabriel', 5, 'Aquí va muchísimo texto', '2022-07-30', 'San José', 'empanada.png');
 
 
 SELECT * FROM review;
@@ -43,15 +43,17 @@ CREATE OR REPLACE PROCEDURE insertReview(
     in_rating IN review.rating%TYPE,
     in_review IN review.review%TYPE,
     in_created IN review.created%TYPE,
-    in_ubicacion IN review.ubicacion%TYPE)
+    in_ubicacion IN review.ubicacion%TYPE,
+    in_fileName IN review.fileName%TYPE)
 IS
 BEGIN
-    INSERT INTO review (restaurante, usuario, rating, review, created, ubicacion)
-    VALUES (in_restaurante, in_usuario, in_rating, in_review, in_created, in_ubicacion);
+    INSERT INTO review (restaurante, usuario, rating, review, created, ubicacion, fileName)
+    VALUES (in_restaurante, in_usuario, in_rating, in_review, in_created, in_ubicacion, in_fileName);
     COMMIT;
 END;
 
 DELETE FROM REVIEW;
+commit;
 EXECUTE insertReview('McDonalds', 'Gabriel', 5, 'Aquí va muchísimo texto', TO_DATE('1989-12-09','YYYY-MM-DD'), 'San José');
 
 ------------ Agregar un usuario
