@@ -13,274 +13,143 @@ if (libPath && fs.existsSync(libPath)) {
 // Define all handlers
 const handlers = {};
 
-// DB use
-handlers.crud = function (data, callback) {
-  const acceptableMethods = ["post", "get", "put", "delete"];
-  if (acceptableMethods.indexOf(data.method) > -1) {
-    handlers._crud[data.method](data, callback);
+handlers.userCrud = function (req, res) {
+  const acceptableMethods = ["POST", "GET", "PUT", "DELETE"];
+  if (acceptableMethods.indexOf(req.method) > -1) {
+    handlers._userCrud[req.method](req, res);
   } else {
-    callback(405);
-  }
-};
-
-// Container for all the CRUD methods
-handlers._crud = {};
-
-handlers._crud.post = async function (data, callback) {
-  var name =
-    typeof data.payload.name == "string" && data.payload.name.trim().length > 0
-      ? data.payload.name.trim()
-      : false;
-  var age =
-    typeof data.payload.age == "number" &&
-    data.payload.age % 1 === 0 &&
-    data.payload.age >= 0
-      ? data.payload.age
-      : false;
-
-  if (name && age) {
-    var connection;
-    try {
-      connection = await oracledb.getConnection(dbconfig);
-      await connection.execute(
-        `INSERT INTO PRUEBA (name, age) VALUES ('${name}', ${age})`
-      );
-      await connection.commit();
-
-      callback(200, { error: "User added to the DB" });
-    } catch (err) {
-      console.error(err);
-      callback(500, { error: "Could not insert into the DB" });
-    } finally {
-      if (connection) {
-        await connection.close();
-      }
-    }
-  } else {
-    callback(400, { error: "Missing required fields" });
-  }
-};
-
-handlers._crud.get = async function (data, callback) {
-  var name =
-    typeof data.queryStringObject.name == "string" &&
-    data.queryStringObject.name.trim().length > 0
-      ? data.queryStringObject.name.trim()
-      : false;
-  if (name) {
-    var connection;
-    try {
-      connection = await oracledb.getConnection(dbconfig);
-      var result = await connection.execute(
-        `SELECT * FROM PRUEBA WHERE name = '${name}'`
-      );
-      await connection.commit();
-      if (result.rows.length > 0) {
-        callback(200, result.rows);
-      } else {
-        callback(404, { error: "User not found" });
-      }
-    } catch (err) {
-      console.error(err);
-      callback(500, { error: "Could not get from the DB" });
-    } finally {
-      if (connection) {
-        await connection.close();
-      }
-    }
-  } else {
-    callback(400, { error: "Missing required fields" });
-  }
-};
-
-handlers._crud.put = async function (data, callback) {
-  var id = parseInt(data.payload.id);
-  var name =
-    typeof data.payload.name == "string" && data.payload.name.trim().length > 0
-      ? data.payload.name.trim()
-      : false;
-  var age =
-    typeof data.payload.age == "number" &&
-    data.payload.age % 1 === 0 &&
-    data.payload.age >= 0
-      ? data.payload.age
-      : false;
-
-  if (id && name && age) {
-    var connection;
-    try {
-      connection = await oracledb.getConnection(dbconfig);
-      await connection.execute(
-        `UPDATE PRUEBA SET name = '${name}', age = ${age} WHERE id = ${id}`
-      );
-      await connection.commit();
-
-      callback(200, { error: "User updated" });
-    } catch (err) {
-      console.error(err);
-      callback(500, { error: "Could not update the DB" });
-    } finally {
-      if (connection) {
-        await connection.close();
-      }
-    }
-  } else {
-    callback(400, { error: "Missing required fields" });
-  }
-};
-
-handlers._crud.delete = async function (data, callback) {
-  console.log(data.payload.id);
-  var id = parseInt(data.payload.id);
-  if (id) {
-    var connection;
-    try {
-      connection = await oracledb.getConnection(dbconfig);
-      await connection.execute(`DELETE FROM PRUEBA WHERE id = ${id}`);
-      await connection.commit();
-
-      callback(200, { error: "User deleted" });
-    } catch (err) {
-      console.error(err);
-      callback(500, { error: "Could not delete from the DB" });
-    } finally {
-      if (connection) {
-        await connection.close();
-      }
-    }
-  } else {
-    callback(400, { error: "Missing required fields" });
-  }
-};
-
-handlers.userCrud = function (data, callback) {
-  const acceptableMethods = ["post", "get", "put", "delete"];
-  if (acceptableMethods.indexOf(data.method) > -1) {
-    handlers._userCrud[data.method](data, callback);
-  } else {
-    callback(405);
+    res(405);
   }
 };
 
 handlers._userCrud = {};
 
-handlers._userCrud.post = async function (data, callback) {
+handlers._userCrud.POST = async function (req, res) {
+  console.log
+  var userName =
+    typeof req.body.userName == "string" &&
+    req.body.userName.trim().length > 0
+      ? req.body.userName.trim()
+      : false;
+  var password =
+    typeof req.body.password == "string" &&
+    req.body.password.trim().length > 0
+      ? req.body.password.trim()
+      : false;
   var nombre =
-    typeof data.payload.nombre == "string" &&
-    data.payload.nombre.trim().length > 0
-      ? data.payload.nombre.trim()
+    typeof req.body.nombre == "string" &&
+    req.body.nombre.trim().length > 0
+      ? req.body.nombre.trim()
       : false;
   var apellido =
-    typeof data.payload.apellido == "string" &&
-    data.payload.apellido.trim().length > 0
-      ? data.payload.apellido.trim()
+    typeof req.body.apellido == "string" &&
+    req.body.apellido.trim().length > 0
+      ? req.body.apellido.trim()
       : false;
   var correo =
-    typeof data.payload.correo == "string" &&
-    data.payload.correo.trim().length > 0
-      ? data.payload.correo.trim()
+    typeof req.body.correo == "string" &&
+    req.body.correo.trim().length > 0
+      ? req.body.correo.trim()
       : false;
   var telefono =
-    typeof data.payload.telefono == "string" &&
-    data.payload.telefono.trim().length > 0
-      ? data.payload.telefono.trim()
+    typeof req.body.telefono == "string" &&
+    req.body.telefono.trim().length > 0
+      ? req.body.telefono.trim()
       : false;
-  if (nombre && apellido && correo && telefono) {
+  if (nombre && apellido && correo && telefono && userName && password) {
     var connection;
     try {
       connection = await oracledb.getConnection(dbconfig);
-      var statement = `addUser ('${nombre}', '${apellido}', '${correo}', '${telefono}');`;
-      console.log(statement);
+      var statement = `addUser ('${nombre}', '${password}', '${userName}', '${apellido}', '${correo}', '${telefono}');`;
       await connection.execute(
         `BEGIN
           ${statement}
          END;`
       );
-      callback(200, { error: "User added to the DB" });
+      res.send("User added!");
     } catch (err) {
       console.error(err);
-      callback(500, { error: "Could not insert into the DB" });
+      res.send("Could not add to the DB");
     } finally {
       if (connection) {
         await connection.close();
       }
     }
   } else {
-    callback(400, { error: data.payload });
+    res.send("Missing required fields");
   }
 };
 
-handlers._userCrud.get = async function (data, callback) {
+handlers._userCrud.GET = async function (req, res) {
   var userName =
-    typeof data.queryStringObject.userName == "string" &&
-    data.queryStringObject.userName.trim().length > 0
-      ? data.queryStringObject.userName.trim()
+    typeof req.query.userName == "string" &&
+    req.query.userName.trim().length > 0
+      ? req.query.userName.trim()
       : false;
   var password =
-    typeof data.queryStringObject.password == "string" &&
-    data.queryStringObject.password.trim().length > 0
-      ? data.queryStringObject.password.trim()
+    typeof req.query.password == "string" &&
+    req.query.password.trim().length > 0
+      ? req.query.password.trim()
       : false;
 
-      console.log(data.queryStringObject);
+      console.log(req.queryStringObject);
   if (userName && password) {
     var connection;
     try {
       connection = await oracledb.getConnection(dbconfig);
       // Por la forma en que oracle retorna resultados de un stored procedure, no se puede extraer los rows
       var statement = `select * from USUARIO where userName = '${userName}' and userPassword = '${password}'`;
-      console.log(statement);
       var result = await connection.execute(`${statement}`);
       await connection.commit();
       if (result.rows.length > 0) {
-        callback(200, result.rows);
+        res.send(result.rows);
       } else {
-        callback(404, { error: "User not found" });
+        res.send("User not found");
       }
     } catch (err) {
       console.error(err);
-      callback(500, { error: "Could not get from the DB" });
+      res.send("Could not get from the DB");
     } finally {
       if (connection) {
         await connection.close();
       }
     }
   } else {
-    callback(400, { error: "Missing required fields" });
+    res.send("Missing required fields");
   }
 };
 
-handlers._userCrud.put = async function (data, callback) {
-  console.log(data.payload);
+handlers._userCrud.PUT = async function (req, res) {
+  console.log(req.payload);
   var indNombre =
-    typeof data.payload.indNombre == "string" &&
-    data.payload.indNombre.trim().length > 0
-      ? data.payload.indNombre.trim()
+    typeof req.payload.indNombre == "string" &&
+    req.payload.indNombre.trim().length > 0
+      ? req.payload.indNombre.trim()
       : false;
   var indApellido =
-    typeof data.payload.indApellido == "string" &&
-    data.payload.indApellido.trim().length > 0
-      ? data.payload.indApellido.trim()
+    typeof req.payload.indApellido == "string" &&
+    req.payload.indApellido.trim().length > 0
+      ? req.payload.indApellido.trim()
       : false;
   var nombre =
-    typeof data.payload.nombre == "string" &&
-    data.payload.nombre.trim().length > 0
-      ? data.payload.nombre.trim()
+    typeof req.payload.nombre == "string" &&
+    req.payload.nombre.trim().length > 0
+      ? req.payload.nombre.trim()
       : false;
   var apellido =
-    typeof data.payload.apellido == "string" &&
-    data.payload.apellido.trim().length > 0
-      ? data.payload.apellido.trim()
+    typeof req.payload.apellido == "string" &&
+    req.payload.apellido.trim().length > 0
+      ? req.payload.apellido.trim()
       : false;
   var correo =
-    typeof data.payload.correo == "string" &&
-    data.payload.correo.trim().length > 0
-      ? data.payload.correo.trim()
+    typeof req.payload.correo == "string" &&
+    req.payload.correo.trim().length > 0
+      ? req.payload.correo.trim()
       : false;
   var telefono =
-    typeof data.payload.telefono == "string" &&
-    data.payload.telefono.trim().length > 0
-      ? data.payload.telefono.trim()
+    typeof req.payload.telefono == "string" &&
+    req.payload.telefono.trim().length > 0
+      ? req.payload.telefono.trim()
       : false;
 
   if (indNombre && indApellido && nombre && apellido && correo && telefono) {
@@ -290,36 +159,35 @@ handlers._userCrud.put = async function (data, callback) {
 
       // Se puede hacer en stored
       var statement = `alterUser('${indNombre}', '${indApellido}', '${nombre}', '${apellido}', '${correo}', '${telefono}')`;
-      console.log(statement);
       await connection.execute(
         `BEGIN
           ${statement};
         END;`
       );
-      callback(200, { error: "User updated in the DB" });
+      res.send("User updated!");
     } catch (err) {
       console.error(err);
-      callback(500, { error: "Could not update in the DB" });
+      res.send("Could not update in the DB");
     } finally {
       if (connection) {
         await connection.close();
       }
     }
   } else {
-    callback(400, { error: "Missing required fields" });
+    res.send("Missing required fields");
   }
 };
 
-handlers._userCrud.delete = async function (data, callback) {
+handlers._userCrud.DELETE = async function (req, res) {
   var nombre =
-    typeof data.payload.nombre == "string" &&
-    data.payload.nombre.trim().length > 0
-      ? data.payload.nombre.trim()
+    typeof req.payload.nombre == "string" &&
+    req.payload.nombre.trim().length > 0
+      ? req.payload.nombre.trim()
       : false;
   var apellido =
-    typeof data.payload.apellido == "string" &&
-    data.payload.apellido.trim().length > 0
-      ? data.payload.apellido.trim()
+    typeof req.payload.apellido == "string" &&
+    req.payload.apellido.trim().length > 0
+      ? req.payload.apellido.trim()
       : false;
   if (nombre && apellido) {
     var connection;
@@ -333,70 +201,78 @@ handlers._userCrud.delete = async function (data, callback) {
       );
       await connection.commit();
 
-      callback(200, { error: "User deleted from the DB" });
+      res(200, { error: "User deleted from the DB" });
     } catch (err) {
       console.error(err);
-      callback(500, { error: "Could not delete from the DB" });
+      res(500, { error: "Could not delete from the DB" });
     } finally {
       if (connection) {
         await connection.close();
       }
     }
   } else {
-    callback(400, { error: "Missing required fields" });
+    res(400, { error: "Missing required fields" });
   }
 };
 
-handlers.crudReviews = function (data, callback) {
-  var acceptableMethods = ["post", "get", "put", "delete"];
-  if (acceptableMethods.indexOf(data.method) > -1) {
-    handlers._crudReviews[data.method](data, callback);
+handlers.crudReviews = function (req, res) {
+  console.log(req.method);
+  var acceptableMethods = ["POST", "GET", "PUT", "DELETE"];
+  if (acceptableMethods.indexOf(req.method) > -1) {
+    handlers._crudReviews[req.method](req, res);
   } else {
-    callback(405);
+    res.send(res.status);
   }
 };
 
 handlers._crudReviews = {};
 
-handlers._crudReviews.post = async function (data, callback) {
+handlers._crudReviews.POST = async function (req, res) {
   var restaurante =
-    typeof data.payload.restaurante == "string" &&
-    data.payload.restaurante.trim().length > 0
-      ? data.payload.restaurante.trim()
+    typeof req.body.restaurante == "string" &&
+    req.body.restaurante.trim().length > 0
+      ? req.body.restaurante.trim()
       : false;
   var usuario =
-    typeof data.payload.usuario == "string" &&
-    data.payload.usuario.trim().length > 0
-      ? data.payload.usuario.trim()
+    typeof req.body.usuario == "string" &&
+    req.body.usuario.trim().length > 0
+      ? req.body.usuario.trim()
       : false;
   var rating =
-    typeof data.payload.rating == "number" &&
-    data.payload.rating % 1 === 0 &&
-    data.payload.rating >= 0
-      ? data.payload.rating
+    typeof req.body.rating == "number" &&
+    req.body.rating % 1 === 0 &&
+    req.body.rating >= 0
+      ? req.body.rating
       : false;
   var review =
-    typeof data.payload.review == "string" &&
-    data.payload.review.trim().length > 0
-      ? data.payload.review.trim()
+    typeof req.body.review == "string" &&
+    req.body.review.trim().length > 0
+      ? req.body.review.trim()
       : false;
   var ubicacion =
-    typeof data.payload.ubicacion == "string" &&
-    data.payload.ubicacion.trim().length > 0
-      ? data.payload.ubicacion.trim()
+    typeof req.body.ubicacion == "string" &&
+    req.body.ubicacion.trim().length > 0
+      ? req.body.ubicacion.trim()
       : false;
   var created =
-    typeof data.payload.created == "string" &&
-    data.payload.created.trim().length > 0
-      ? data.payload.created.trim()
+    typeof req.body.created == "string" &&
+    req.body.created.trim().length > 0
+      ? req.body.created.trim()
       : false;
+
+  var fileName = 
+    typeof req.body.fileName == "string" &&
+    req.body.fileName.trim().length > 0
+      ? req.body.fileName.trim()
+      : false;
+
+
 
   if (restaurante && usuario && rating && review && ubicacion && created) {
     var connection;
     try {
       connection = await oracledb.getConnection(dbconfig);
-      var statement = `insertReview('${restaurante}', '${usuario}', ${rating}, '${review}', TO_DATE('${created}','YYYY-MM-DD'), '${ubicacion}')`;
-      console.log(statement);
+      var statement = `insertReview('${restaurante}', '${usuario}', ${rating}, '${review}', TO_DATE('${created}','YYYY-MM-DD'), '${ubicacion}', '${fileName}')`;
       await connection.execute(
         `BEGIN
           ${statement};
@@ -404,30 +280,30 @@ handlers._crudReviews.post = async function (data, callback) {
       );
       await connection.commit();
 
-      callback(200, { error: "Review created!" });
+      res.send("Review created!");
     } catch (err) {
       console.error(err);
-      callback(500, { error: "Could not insert in the DB" });
+      res.send("Could not insert in the DB");
     } finally {
       if (connection) {
         await connection.close();
       }
     }
   } else {
-    callback(400, { error: "Missing required fields" });
+    res.send("Missing required fields");
   }
 };
 
-handlers._crudReviews.get = async function (data, callback) {
+handlers._crudReviews.GET = async function (req, res) {
   var connection;
   try {
     connection = await oracledb.getConnection(dbconfig);
     var statement = `SELECT * FROM REVIEW`;
     var result = await connection.execute(statement);
-    callback(200, result.rows);
+    res.send(result.rows);
   } catch (err) {
     console.error(err);
-    callback(500, { error: "Could not get from the DB" });
+    res.send();
   } finally {
     if (connection) {
       await connection.close();
@@ -435,29 +311,30 @@ handlers._crudReviews.get = async function (data, callback) {
   }
 };
 
-handlers.loneReview = function (data, callback) {
-  var acceptableMethods = ["get", "put", "delete"];
-  if (acceptableMethods.indexOf(data.method) > -1) {
-    handlers._loneReview[data.method](data, callback);
+handlers.loneReview = function (req, res) {
+  var acceptableMethods = ["GET", "PUT", "DELETE"];
+  if (acceptableMethods.indexOf(req.method) > -1) {
+    handlers._loneReview[req.method](req, res);
   } else {
-    callback(405);
+    res.send(405);
   }
 };
 
 handlers._loneReview = {};
 
-handlers._loneReview.get = async function (data, callback) {
-  id = data.queryStringObject.id;
+handlers._loneReview.GET = async function (req, res) {
+  console.log(req.params);
+  id = req.query.id;
   if (id) {
     var connection;
     try {
       connection = await oracledb.getConnection(dbconfig);
       var statement = `SELECT * FROM REVIEW WHERE ID_REVIEW = ${id}`;
       var result = await connection.execute(statement);
-      callback(200, result.rows);
+      res.send(result.rows);
     } catch (err) {
       console.error(err);
-      callback(500, { error: "Could not get from the DB" });
+      res.send("Could not get from the DB");
     } finally {
       if (connection) {
         await connection.close();
@@ -466,38 +343,37 @@ handlers._loneReview.get = async function (data, callback) {
   }
 };
 
-handlers._loneReview.put = async function (data, callback) {
-  id = data.queryStringObject.id;
+handlers._loneReview.PUT = async function (req, res) {
   var restaurante =
-    typeof data.payload.restaurante == "string" &&
-    data.payload.restaurante.trim().length > 0
-      ? data.payload.restaurante.trim()
+    typeof req.payload.restaurante == "string" &&
+    req.payload.restaurante.trim().length > 0
+      ? req.payload.restaurante.trim()
       : false;
   var usuario =
-    typeof data.payload.usuario == "string" &&
-    data.payload.usuario.trim().length > 0
-      ? data.payload.usuario.trim()
+    typeof req.payload.usuario == "string" &&
+    req.payload.usuario.trim().length > 0
+      ? req.payload.usuario.trim()
       : false;  
   var rating =
-    typeof data.payload.rating == "number" &&
-    data.payload.rating % 1 === 0 &&
-    data.payload.rating >= 0
-      ? data.payload.rating
+    typeof req.payload.rating == "number" &&
+    req.payload.rating % 1 === 0 &&
+    req.payload.rating >= 0
+      ? req.payload.rating
       : false;
   var review =
-    typeof data.payload.review == "string" &&
-    data.payload.review.trim().length > 0
-      ? data.payload.review.trim()
+    typeof req.payload.review == "string" &&
+    req.payload.review.trim().length > 0
+      ? req.payload.review.trim()
       : false;
   var ubicacion =
-    typeof data.payload.ubicacion == "string" &&
-    data.payload.ubicacion.trim().length > 0
-      ? data.payload.ubicacion.trim()
+    typeof req.payload.ubicacion == "string" &&
+    req.payload.ubicacion.trim().length > 0
+      ? req.payload.ubicacion.trim()
       : false;
   var created =
-    typeof data.payload.created == "string" &&
-    data.payload.created.trim().length > 0
-      ? data.payload.created.trim()
+    typeof req.payload.created == "string" &&
+    req.payload.created.trim().length > 0
+      ? req.payload.created.trim()
       : false;
 
   if (id && restaurante && usuario && rating && review && ubicacion && created) {
@@ -513,10 +389,10 @@ handlers._loneReview.put = async function (data, callback) {
       );
       await connection.commit();
         
-      callback(200, { error: "Review updated!" });
+      res(200, { error: "Review updated!" });
     } catch (err) {
       console.error(err);
-      callback(500, { error: "Could not update in the DB" });
+      res(500, { error: "Could not update in the DB" });
     } finally {
       if (connection) {
         await connection.close();
@@ -524,18 +400,48 @@ handlers._loneReview.put = async function (data, callback) {
       }
     }
   } else {
-    callback(400, { error: "Missing required fields" });
+    res(400, { error: "Missing required fields" });
   }
 }
 
-// Ping handler
-handlers.ping = function (data, callback) {
-  callback(200, { status: "Success!" });
-};
+handlers._loneReview.DELETE = async function (req, res) {
+  console.log(req.body.id);
+  var id = 
+    typeof req.body.id == "number" &&
+    req.body.id % 1 === 0 &&
+    req.body.id >= 0
+      ? req.body.id
+      : false;
+  
+  if (id) {
+    var connection;
+    try {
+      connection = await oracledb.getConnection(dbconfig);
+      var statement = `DELETE FROM REVIEW WHERE ID_REVIEW = ${id}`;
+      await connection.execute(
+        `BEGIN
+          ${statement};
+        END;`
+      );
+      await connection.commit();
+      res.send("Review deleted!");
+    } catch (err) {
+      console.error(err);
+      res.send("Could not delete from the DB");
+    } finally {
+      if (connection) {
+        await connection.close();
+      }
+    }
+  } else {
+    res.send("Missing required fields");
+  }
+}
+
 
 // Not found handler
-handlers.notFound = function (data, callback) {
-  callback(404);
+handlers.notFound = function (req, res) {
+  res.send(404);
 };
 
 module.exports = handlers;
