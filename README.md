@@ -40,10 +40,10 @@ Run the sql file on the project
  
   @TODO
  
-Adding Support to MAC's oracle process
+Adding Support to MAC's oracle process (??)
 
 ~~Connecting the [front end](https://github.com/Gabrielmong/main-project-front) with the API~~
 
-Refactor the CRUD so it can be used for user transactions and enventually posts (reviews)
+~~Refactor the CRUD so it can be used for user transactions and enventually posts (reviews)~~
 
-Make a new api that can actually handle image upload, probably with express.js, making the backend natively has given some issues
+~~Make a new api that can actually handle image upload, probably with express.js, making the backend natively has given some issues~~
