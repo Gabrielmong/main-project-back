@@ -4,6 +4,7 @@
 const oracledb = require("oracledb");
 const fs = require("fs");
 const dbconfig = require("./dbconfig.js");
+const { password } = require("./dbconfig.js");
 const libPath = "C:\\oracle\\instantclient_21_6";
 
 if (libPath && fs.existsSync(libPath)) {
@@ -66,6 +67,7 @@ handlers._userCrud.POST = async function (req, res) {
           ${statement}
          END;`
       );
+      console.log("User created.");
       res.send("User added!");
     } catch (err) {
       console.error(err);
@@ -92,7 +94,6 @@ handlers._userCrud.GET = async function (req, res) {
       ? req.query.password.trim()
       : false;
 
-      console.log(req.queryStringObject);
   if (userName && password) {
     var connection;
     try {
@@ -102,7 +103,9 @@ handlers._userCrud.GET = async function (req, res) {
       var result = await connection.execute(`${statement}`);
       await connection.commit();
       if (result.rows.length > 0) {
+        console.log("User fetched.");
         res.send(result.rows);
+
       } else {
         res.send("User not found");
       }
@@ -120,50 +123,59 @@ handlers._userCrud.GET = async function (req, res) {
 };
 
 handlers._userCrud.PUT = async function (req, res) {
-  console.log(req.payload);
-  var indNombre =
-    typeof req.payload.indNombre == "string" &&
-    req.payload.indNombre.trim().length > 0
-      ? req.payload.indNombre.trim()
+  var indUser =
+    typeof req.body.indUser == "string" &&
+    req.body.indUser.trim().length > 0
+      ? req.body.indUser.trim()
       : false;
-  var indApellido =
-    typeof req.payload.indApellido == "string" &&
-    req.payload.indApellido.trim().length > 0
-      ? req.payload.indApellido.trim()
+  var indPassword =
+    typeof req.body.indPassword == "string" &&
+    req.body.indPassword.trim().length > 0
+      ? req.body.indPassword.trim()
+      : false;
+  var userName =
+    typeof req.body.userName == "string" &&
+    req.body.userName.trim().length > 0
+      ? req.body.userName.trim()
+      : false;
+  var password =
+    typeof req.body.password == "string" &&
+    req.body.password.trim().length > 0
+      ? req.body.password.trim()
       : false;
   var nombre =
-    typeof req.payload.nombre == "string" &&
-    req.payload.nombre.trim().length > 0
-      ? req.payload.nombre.trim()
+    typeof req.body.nombre == "string" &&
+    req.body.nombre.trim().length > 0
+      ? req.body.nombre.trim()
       : false;
   var apellido =
-    typeof req.payload.apellido == "string" &&
-    req.payload.apellido.trim().length > 0
-      ? req.payload.apellido.trim()
+    typeof req.body.apellido == "string" &&
+    req.body.apellido.trim().length > 0
+      ? req.body.apellido.trim()
       : false;
   var correo =
-    typeof req.payload.correo == "string" &&
-    req.payload.correo.trim().length > 0
-      ? req.payload.correo.trim()
+    typeof req.body.correo == "string" &&
+    req.body.correo.trim().length > 0
+      ? req.body.correo.trim()
       : false;
   var telefono =
-    typeof req.payload.telefono == "string" &&
-    req.payload.telefono.trim().length > 0
-      ? req.payload.telefono.trim()
+    typeof req.body.telefono == "string" &&
+    req.body.telefono.trim().length > 0
+      ? req.body.telefono.trim()
       : false;
-
-  if (indNombre && indApellido && nombre && apellido && correo && telefono) {
+  if (indUser && indPassword && userName && password && nombre && apellido && correo && telefono) {
     var connection;
     try {
       connection = await oracledb.getConnection(dbconfig);
 
       // Se puede hacer en stored
-      var statement = `alterUser('${indNombre}', '${indApellido}', '${nombre}', '${apellido}', '${correo}', '${telefono}')`;
+      var statement = `alterUser('${indUser}', '${indPassword}', '${userName}','${nombre}', '${password}', '${apellido}', '${correo}', '${telefono}')`;
       await connection.execute(
         `BEGIN
           ${statement};
         END;`
       );
+      console.log("User updated.");
       res.send("User updated!");
     } catch (err) {
       console.error(err);
@@ -180,14 +192,14 @@ handlers._userCrud.PUT = async function (req, res) {
 
 handlers._userCrud.DELETE = async function (req, res) {
   var nombre =
-    typeof req.payload.nombre == "string" &&
-    req.payload.nombre.trim().length > 0
-      ? req.payload.nombre.trim()
+    typeof req.body.nombre == "string" &&
+    req.body.nombre.trim().length > 0
+      ? req.body.nombre.trim()
       : false;
   var apellido =
-    typeof req.payload.apellido == "string" &&
-    req.payload.apellido.trim().length > 0
-      ? req.payload.apellido.trim()
+    typeof req.body.apellido == "string" &&
+    req.body.apellido.trim().length > 0
+      ? req.body.apellido.trim()
       : false;
   if (nombre && apellido) {
     var connection;
@@ -200,23 +212,22 @@ handlers._userCrud.DELETE = async function (req, res) {
         END;`
       );
       await connection.commit();
-
-      res(200, { error: "User deleted from the DB" });
+      console.log("User deleted.");
+      res("User deleted!");
     } catch (err) {
       console.error(err);
-      res(500, { error: "Could not delete from the DB" });
+      res("Could not delete from the DB");
     } finally {
       if (connection) {
         await connection.close();
       }
     }
   } else {
-    res(400, { error: "Missing required fields" });
+    res("Missing required fields");
   }
 };
 
 handlers.crudReviews = function (req, res) {
-  console.log(req.method);
   var acceptableMethods = ["POST", "GET", "PUT", "DELETE"];
   if (acceptableMethods.indexOf(req.method) > -1) {
     handlers._crudReviews[req.method](req, res);
@@ -265,9 +276,6 @@ handlers._crudReviews.POST = async function (req, res) {
     req.body.fileName.trim().length > 0
       ? req.body.fileName.trim()
       : false;
-
-
-
   if (restaurante && usuario && rating && review && ubicacion && created) {
     var connection;
     try {
@@ -279,7 +287,7 @@ handlers._crudReviews.POST = async function (req, res) {
         END;`
       );
       await connection.commit();
-
+      console.log("Review created.");
       res.send("Review created!");
     } catch (err) {
       console.error(err);
@@ -300,6 +308,7 @@ handlers._crudReviews.GET = async function (req, res) {
     connection = await oracledb.getConnection(dbconfig);
     var statement = `SELECT * FROM REVIEW`;
     var result = await connection.execute(statement);
+    console.log("Reviews retrieved.");
     res.send(result.rows);
   } catch (err) {
     console.error(err);
@@ -323,7 +332,6 @@ handlers.loneReview = function (req, res) {
 handlers._loneReview = {};
 
 handlers._loneReview.GET = async function (req, res) {
-  console.log(req.params);
   id = req.query.id;
   if (id) {
     var connection;
@@ -331,6 +339,7 @@ handlers._loneReview.GET = async function (req, res) {
       connection = await oracledb.getConnection(dbconfig);
       var statement = `SELECT * FROM REVIEW WHERE ID_REVIEW = ${id}`;
       var result = await connection.execute(statement);
+      console.log("Single review fetched.");
       res.send(result.rows);
     } catch (err) {
       console.error(err);

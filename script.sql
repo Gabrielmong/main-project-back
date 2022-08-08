@@ -80,11 +80,13 @@ Begin
     Delete from USUARIO WHERE userName = p_userName and userPassword = p_userPassword ; 
     COMMIT; 
 END;
------------- Editar un usuario
 
+------------ Editar un usuario
+SET SERVEROUTPUT ON
 CREATE OR REPLACE PROCEDURE alterUser (
     ind_userName IN usuario.userName%TYPE,
     ind_userPassword IN usuario.userPassword%TYPE,
+    in_userName IN usuario.userName%TYPE,
     in_nombre IN usuario.nombre%TYPE,
     in_userPassword IN usuario.userPassword%TYPE,
     in_apellido IN usuario.apellido%TYPE,
@@ -92,7 +94,14 @@ CREATE OR REPLACE PROCEDURE alterUser (
     in_telefono IN usuario.telefono%TYPE)
 IS
 BEGIN
-    UPDATE USUARIO SET nombre = in_nombre, apellido = in_apellido, correo = in_correo, telefono = in_telefono
+    DBMS_OUTPUT.PUT_LINE(ind_userName||' '||ind_userPassword);
+    UPDATE USUARIO SET 
+        username = in_userName,
+        userpassword = in_userPassword,
+        nombre = in_nombre, 
+        apellido = in_apellido, 
+        correo = in_correo, 
+        telefono = in_telefono
     WHERE userName = ind_userName AND userpassword = ind_userPassword;
     COMMIT;
 END;
