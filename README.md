@@ -1,4 +1,4 @@
-# Backend for main project
+# Backend for Empanada Review
 
 This project is developed on Node.js
 
@@ -16,7 +16,7 @@ This starts the server on the port 4000, you can change this on the config.js fi
 
 Using Oracle Databse, you need to install the [Oracle Intant Client](https://www.oracle.com/database/technologies/instant-client/downloads.html) and locate in C:\\oracle\\instantclient_21_6
 
-Open SQL Plus and create a user (VSCODE/ORACLE) and grant required permissions, if having trouble with this, run this command: 
+Run these commands on SQL Plus:
 ###
     ALTER SESSION SET "_ORACLE_SCRIPT"=TRUE;
     
