@@ -281,6 +281,7 @@ handlers._crudReviews.POST = async function (req, res) {
     try {
       connection = await oracledb.getConnection(dbconfig);
       var statement = `insertReview('${restaurante}', '${usuario}', ${rating}, '${review}', TO_DATE('${created}','YYYY-MM-DD'), '${ubicacion}', '${fileName}')`;
+      console.log(statement);
       await connection.execute(
         `BEGIN
           ${statement};
@@ -353,55 +354,46 @@ handlers._loneReview.GET = async function (req, res) {
 };
 
 handlers._loneReview.PUT = async function (req, res) {
-  var restaurante =
-    typeof req.payload.restaurante == "string" &&
-    req.payload.restaurante.trim().length > 0
-      ? req.payload.restaurante.trim()
+  var id =
+    typeof req.body.id == "string" && req.body.id % 1 === 0 && req.body.id >= 0
+      ? req.body.id
       : false;
-  var usuario =
-    typeof req.payload.usuario == "string" &&
-    req.payload.usuario.trim().length > 0
-      ? req.payload.usuario.trim()
-      : false;  
   var rating =
-    typeof req.payload.rating == "number" &&
-    req.payload.rating % 1 === 0 &&
-    req.payload.rating >= 0
-      ? req.payload.rating
+    typeof req.body.rating == "number" &&
+    req.body.rating % 1 === 0 &&
+    req.body.rating >= 0
+      ? req.body.rating
       : false;
   var review =
-    typeof req.payload.review == "string" &&
-    req.payload.review.trim().length > 0
-      ? req.payload.review.trim()
+    typeof req.body.review == "string" &&
+    req.body.review.trim().length > 0
+      ? req.body.review.trim()
       : false;
-  var ubicacion =
-    typeof req.payload.ubicacion == "string" &&
-    req.payload.ubicacion.trim().length > 0
-      ? req.payload.ubicacion.trim()
-      : false;
-  var created =
-    typeof req.payload.created == "string" &&
-    req.payload.created.trim().length > 0
-      ? req.payload.created.trim()
+  var edited =
+    typeof req.body.edited == "string" &&
+    req.body.edited.trim().length > 0
+      ? req.body.edited.trim()
       : false;
 
-  if (id && restaurante && usuario && rating && review && ubicacion && created) {
+  console.log(id, rating, review, edited);
+
+  if (id && rating && review && edited) {
     var connection;
     try {
       connection = await oracledb.getConnection(dbconfig);
-      var statement = `UPDATE REVIEW SET RESTAURANTE = '${restaurante}', USUARIO = '${usuario}', RATING = ${rating}, REVIEW = '${review}', UBICACION = '${ubicacion}', CREATED = TO_DATE('${created}','YYYY-MM-DD') WHERE ID_REVIEW = ${id}`;
-
+      var statement = `editReview(${id}, ${rating}, '${review}', TO_DATE('${edited}','YYYY-MM-DD'))`;
       await connection.execute(
         `BEGIN
           ${statement};
         END;`
       );
       await connection.commit();
-        
-      res(200, { error: "Review updated!" });
+      console.log("Review edited.");
+      res.send("Review edited!");
+
     } catch (err) {
       console.error(err);
-      res(500, { error: "Could not update in the DB" });
+      res.send("Could not edit in the DB");
     } finally {
       if (connection) {
         await connection.close();
@@ -409,7 +401,7 @@ handlers._loneReview.PUT = async function (req, res) {
       }
     }
   } else {
-    res(400, { error: "Missing required fields" });
+    res.send("Missing required fields");
   }
 }
 

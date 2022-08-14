@@ -106,6 +106,7 @@ CREATE TABLE review (
     rest_score NUMBER(1),
     review VARCHAR2(1024),
     created DATE,
+    edited DATE,
     ubicacion VARCHAR2(20),
     fileName VARCHAR2(500),
     CONSTRAINT review_pk PRIMARY KEY (id_Review),
@@ -136,6 +137,23 @@ BEGIN
     VALUES (in_restaurante, in_usuario, in_rating, in_review, in_created, in_ubicacion, in_fileName);
     COMMIT;
     DBMS_OUTPUT.PUT_LINE('Review created');
+END;
+
+CREATE OR REPLACE PROCEDURE editReview(
+    in_idRev IN review.id_Review%TYPE,
+    in_rating IN review.rating%TYPE,
+    in_review IN review.review%TYPE,
+    in_edited IN review.edited%TYPE)
+IS
+BEGIN
+    UPDATE REVIEW SET
+        rating = in_rating,
+        review = in_review,
+        edited = in_edited
+    WHERE id_Review = in_idRev;
+    COMMIT;
+    DBMS_OUTPUT.PUT_LINE('Review edited');
+    
 END;
 
 ------------ Agregar un usuario
