@@ -65,6 +65,8 @@ CREATE TABLE empleado (
     REFERENCES restaurante(id_Restaurante)
 );
 
+-- inserts
+
 insert into restaurante(nombre,tipo_Comida, price_Range, fileName)
   values('McDonalds','Fast food', 3, ' ');
   insert into restaurante(nombre,tipo_Comida, price_Range, fileName)
@@ -87,14 +89,32 @@ insert into restaurante(nombre,tipo_Comida, price_Range, fileName)
   insert into platillo(restaurante,descripcion, nombre, precio)
   values(03,'hamburguesa con aguacate y carne angus', 'doble guacamoles', 6500);
 
- insert into restaurante(nombre,tipo_Comida, price_Range, fileName)
-  values('McDonalds','Fast food', 3, ' ');
-  insert into restaurante(nombre,tipo_Comida, price_Range, fileName)
-  values('Nacion sushi','asiatico', 5, ' ');
-  insert into restaurante(nombre,tipo_Comida, price_Range, fileName)
-  values('smash burger','Fast food', 4, ' ');
+  insert into bebida(restaurante,descripcion, nombre, precio)
+  values(01,'coca cola', 'coca cola', 1200);
+  insert into bebida(restaurante,descripcion, nombre, precio)
+  values(02,'vino con frutas','sangria', 2000);
+  insert into bebida(restaurante,descripcion, nombre, precio)
+  values(03,'bebida de manzana', 'jugo de manzana',700);
 
-  select * from platillo;
+  insert into dieta(restaurante,dieta, ubicacion)
+    values(01,'vegetariano','san jose');
+  insert into dieta(restaurante,dieta, ubicacion)
+    values(02,'pescetarian','pinares');
+  insert into dieta(restaurante,dieta, ubicacion)
+    values(03,'keto', 'curridabat');
+
+    insert into empleado(restaurante,nombre, apellido, puesto)
+      values(01,'luis','perez', 'gerente');
+    insert into empleado(restaurante,nombre, apellido, puesto)
+      values(01,'Ana','Gonzalez', 'cajera');
+    insert into empleado(restaurante,nombre, apellido, puesto)
+      values(02,'Daniela','Granados', 'mesera');
+            
+
+select * from restaurante
+   inner join platillo
+   on restaurante.id_restaurante = platillo.restaurante
+   where id_restaurante = 01;
 
 
   -- aqui hay un fuckie fuckie no revisa si ya esta en la tabla
@@ -153,7 +173,7 @@ BEGIN
     WHERE id_Review = in_idRev;
     COMMIT;
     DBMS_OUTPUT.PUT_LINE('Review edited');
-    
+
 END;
 
 ------------ Agregar un usuario
