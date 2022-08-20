@@ -281,7 +281,6 @@ handlers._crudReviews.POST = async function (req, res) {
     try {
       connection = await oracledb.getConnection(dbconfig);
       var statement = `insertReview('${restaurante}', '${usuario}', ${rating}, '${review}', TO_DATE('${created}','YYYY-MM-DD'), '${ubicacion}', '${fileName}')`;
-      console.log(statement);
       await connection.execute(
         `BEGIN
           ${statement};
