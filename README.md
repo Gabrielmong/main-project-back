@@ -37,11 +37,13 @@ And finally open the plugabble database:
 
 Run the sql file on the project 
 
- Get you pluggable database name and type it on dbconfig.js
+ Get you pluggable database name and type it on an .env file 
+ 
+    CONN_STRING=localhost/orclpdb
  
   @TODO
  
-Adding Support to MAC's oracle process (??)
+~~Adding Support to MAC's oracle process (??)~~ -> Out of Scope
 
 ~~Connecting the [front end](https://github.com/Gabrielmong/main-project-front) with the API~~
 
