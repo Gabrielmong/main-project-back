@@ -52,6 +52,14 @@ app.all("/loneReview", (req, res) => {
   handlers.loneReview(req, res);
 });
 
+app.all("/optionalDBDish", (req, res) => {
+  handlers.optionalDBDish(req, res);
+});
+
+app.all("/optionalDBDrink", (req, res) => {
+  handlers.optionalDBDrink(req, res);
+});
+
 app.listen(port, () => {
   console.log(
     `    Server is listening on port ${port}. \n    Press CTRL + C to stop the server. \n    Check connection at: http://localhost:${port}/ping \n\n`
