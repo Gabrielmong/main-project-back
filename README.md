@@ -39,7 +39,7 @@ Run the sql file on the project
 
  Get you pluggable database name and type it on an .env file 
  
-    CONN_STRING=localhost/orclpdb
+    CONN_STRING=localhost/[PBD Name]
  
   @TODO
  
