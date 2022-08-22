@@ -74,7 +74,7 @@ CREATE SEQUENCE usuario_seq
   START WITH 1
   INCREMENT BY 1
   CACHE 100;
-  
+
 DROP SEQUENCE restaurante_seq;
 CREATE SEQUENCE restaurante_seq
   START WITH 1
@@ -138,7 +138,7 @@ delete from platillo where restaurante = 4;
   values(4,'Homemade bread, maple syrup and fruits', 'French Toast', 3465);
   insert into platillo(restaurante,descripcion, nombre, precio)
   values(4,'Simmered, red wine sauce', 'Onion Soup', 4873);
-  
+
   commit;
 
 delete from bebida;
@@ -170,17 +170,17 @@ delete from bebida;
       values(02,'Daniela','Granados', 'mesera');
 
 
-      create or replace package restaurantes
+  create or replace package restaurantes
       as
         g_restaurante restaurante.id_restaurante%type;
 
         function get_restaurante
-          return restaurante.id_restaurantee%type;
+          return restaurante.id_restaurante%type;
 
         procedure set_restaurante( p_restaurante in restaurante.id_restaurante%type );
       end restaurantes;
 
-      create or replace package body restaurante
+      create or replace package body restaurantes
       as
         procedure set_restaurante( p_restaurante in restaurante.id_restaurante%type )
         as
@@ -201,6 +201,30 @@ delete from bebida;
       select *
         from restaurante
        where id_restaurante = restaurantes.get_restaurante;
+
+       SET SERVEROUTPUT ON
+
+  CREATE OR REPLACE FUNCTION restaurante(selector_In in number)
+       return VARCHAR2
+       IS
+           restaurante varchar2(500) := '';
+           tipo varchar2(500) := '';
+           rango varchar2(500) := '';
+           mensaje varchar2(500) := '';
+       BEGIN
+           RESTAURANTES.SET_RESTAURANTE(3);
+           select nombre, tipo_comida, price_range into restaurante, tipo, rango from RESTAURANTE_VIEW;
+           mensaje := ('Restaurante: ' || restaurante || ' | Tipo: ' || tipo || ' | Rango de Precio: ' || rango);
+           return mensaje;
+       end;
+
+       DECLARE
+           salida varchar2(500) := '';
+       BEGIN
+           salida := restaurante(1);
+           DBMS_OUTPUT.PUT_LINE(salida);
+       END;
+
 
 select * from restaurante
    inner join platillo
