@@ -6,7 +6,7 @@ This project is developed on Node.js
 
 Install all dependencies used
 
-### `node index.js`
+### `npm start`
 
 This starts the server on the port 4000, you can change this on the config.js file
 
