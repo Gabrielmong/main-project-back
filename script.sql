@@ -170,6 +170,38 @@ delete from bebida;
       values(02,'Daniela','Granados', 'mesera');
 
 
+      create or replace package restaurantes
+      as
+        g_restaurante restaurante.id_restaurante%type;
+
+        function get_restaurante
+          return restaurante.id_restaurantee%type;
+
+        procedure set_restaurante( p_restaurante in restaurante.id_restaurante%type );
+      end restaurantes;
+
+      create or replace package body restaurante
+      as
+        procedure set_restaurante( p_restaurante in restaurante.id_restaurante%type )
+        as
+        begin
+          g_restaurante := p_restaurante;
+        end;
+
+        function get_restaurante
+          return restaurante.id_restaurante%type
+        is
+        begin
+          return g_restaurante;
+        end;
+      end;
+
+      create or replace view restaurante_view
+      as
+      select *
+        from restaurante
+       where id_restaurante = restaurantes.get_restaurante;
+
 select * from restaurante
    inner join platillo
    on restaurante.id_restaurante = platillo.restaurante;
@@ -317,7 +349,10 @@ CREATE TABLE review (
     fileName VARCHAR2(500),
     CONSTRAINT review_pk PRIMARY KEY (id_Review)
 );
+<<<<<<< Updated upstream
 
 select * from review;
 
 SELECT * FROM REVIEW ORDER BY id_Review DESC;
+=======
+>>>>>>> Stashed changes
