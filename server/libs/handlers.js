@@ -4,7 +4,6 @@
 const oracledb = require("oracledb");
 const fs = require("fs");
 const dbconfig = require("./dbconfig.js");
-const { password } = require("./dbconfig.js");
 const libPath = "C:\\oracle\\instantclient_21_6";
 const helpers = require("./helpers");
 const baseDir = __dirname.slice(0, -11) + "public\\";
@@ -411,6 +410,7 @@ handlers._loneReview.DELETE = async function (req, res) {
       );
       await connection.commit();
       helpers.deleteFile(baseDir + fileName);
+      console.log("Review deleted.");
       res.send("Review deleted!");
     } catch (err) {
       console.error(err);
@@ -475,7 +475,7 @@ handlers._optionalDBDrink.GET = async function (req, res) {
     inner join bebida
     on restaurante.id_restaurante = bebida.restaurante`;
     var result = await connection.execute(statement);
-    console.log("Dishes retrieved.");
+    console.log("Drinks retrieved.");
     res.send(result.rows);
   } catch (err) {
     console.error(err);
